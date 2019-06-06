@@ -3,16 +3,17 @@ from random import random
 from math import exp
 from time import time
 import numpy as np
-from evaluator import evaluate_tardiness_partial
 
 class Optimizer:
-    def __init__(self, evaluator, proc_times, weights, deadlines):
+    def __init__(self, evaluator, partial_evaluator, proc_times, weights, deadlines):
         self.proc_times = proc_times
         self.weights = weights
         self.deadlines = deadlines
         self.evaluator = partial(evaluator, proc_times=proc_times, weights=weights, deadlines=deadlines)
-        self.partial_evaluator = partial(evaluate_tardiness_partial, proc_times=proc_times, weights=weights, deadlines=deadlines)
+        self.partial_evaluator = partial(partial_evaluator, proc_times=proc_times, weights=weights, deadlines=deadlines)
         (self.n, self.m) = proc_times.shape
+
+    def evaluate_solution(self, solution, )
 
     def NEH_edd(self):
         # Sort jobs by deadline
@@ -53,8 +54,8 @@ class IG_RLS(Optimizer):
     Engineering 98 (2016): 300-307.
     """
 
-    def __init__(self, evaluator, proc_times, weights, deadlines, d, T, weighted_temperature = False):
-        super().__init__(evaluator, proc_times, weights, deadlines)
+    def __init__(self, evaluator, partial_evaluator, proc_times, weights, deadlines, d, T, weighted_temperature = False):
+        super().__init__(evaluator, partial_evaluator, proc_times, weights, deadlines)
         self.d = d
         self.T = T
         self.weighted_temperature = weighted_temperature

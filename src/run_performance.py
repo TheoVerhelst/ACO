@@ -3,7 +3,7 @@ import csv
 from pathlib import Path
 from os.path import join
 from parser import parse_instance
-from evaluator import evaluate_tardiness
+from evaluator import evaluate_tardiness, evaluate_tardiness_partial
 from random import shuffle, seed
 import numpy as np
 from optimizer import IG_RLS
@@ -19,7 +19,7 @@ out_path = argv[2]
 
 max_time = 30
 repetitions = 10
-"""
+
 parameter_space = {
     "IG_RLS": {
         "optimizer": IG_RLS,
@@ -29,13 +29,6 @@ parameter_space = {
         "optimizer": MaxMinAS,
         "parameters": {"n_ants": 10,  "p_0": 0.9, "trail_min_max_ratio": 5, "stagnation_threshold": 5, "trail_persistence": 0.75}
     },
-    "RankBasedAS": {
-        "optimizer": RankBasedAS,
-        "parameters": {"n_ants":  10, "number_top": 3, "trail_persistence": 0.75}
-    }
-}"""
-
-parameter_space = {
     "RankBasedAS": {
         "optimizer": RankBasedAS,
         "parameters": {"n_ants":  10, "number_top": 3, "trail_persistence": 0.75}
@@ -65,7 +58,7 @@ for algo in parameter_space:
             seed(42)
             np.random.seed(42)
             for i in range(repetitions):
-                optimizer = optimizer_class(evaluate_tardiness, proc_times, weights, deadlines, **parameters)
+                optimizer = optimizer_class(evaluate_tardiness, evaluate_tardiness_partial, proc_times, weights, deadlines, **parameters)
                 solution, evaluation = optimizer.optimize(max_time = max_time)
                 row[str(i)] = evaluation
             writer.writerow(row)

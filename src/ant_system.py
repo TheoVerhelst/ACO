@@ -6,8 +6,8 @@ from optimizer import Optimizer
 class AntSystem(Optimizer):
     """Generic Ant System for the Flow Shop Problem."""
 
-    def __init__(self, evaluator, proc_times, weights, deadlines, n_ants):
-        super().__init__(evaluator, proc_times, weights, deadlines)
+    def __init__(self, evaluator, partial_evaluator, proc_times, weights, deadlines, n_ants):
+        super().__init__(evaluator, partial_evaluator, proc_times, weights, deadlines)
         self.n_ants = n_ants
 
     def optimize(self, max_time):
@@ -49,8 +49,8 @@ class MaxMinAS(AntSystem):
     Computing. Vol. 3. 1998.
     """
 
-    def __init__(self, evaluator, proc_times, weights, deadlines, n_ants, p_0, trail_min_max_ratio, stagnation_threshold, trail_persistence):
-        super().__init__(evaluator, proc_times, weights, deadlines, n_ants)
+    def __init__(self, evaluator, partial_evaluator, proc_times, weights, deadlines, n_ants, p_0, trail_min_max_ratio, stagnation_threshold, trail_persistence):
+        super().__init__(evaluator, partial_evaluator, proc_times, weights, deadlines, n_ants)
         self.p_0 = p_0
         self.trail_min_max_ratio = trail_min_max_ratio
         self.trail_persistence = trail_persistence

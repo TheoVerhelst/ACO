@@ -3,7 +3,7 @@ import csv
 from pathlib import Path
 from os.path import join
 from parser import parse_instance
-from evaluator import evaluate_tardiness
+from evaluator import evaluate_tardiness, evaluate_tardiness_partial
 from random import shuffle, seed
 import numpy as np
 from optimizer import IG_RLS
@@ -22,7 +22,6 @@ out_path = argv[2]
 
 max_time = 30
 
-"""
 parameter_space = {
     "IG_RLS": {
         "optimizer": IG_RLS,
@@ -58,22 +57,6 @@ parameter_space = {
         ]
     }
 }
-"""
-
-
-parameter_space = {
-    "IG_RLS": {
-        "optimizer": IG_RLS,
-        "parameters": [
-            {"d": 2, "T": 1, "weighted_temperature": False},
-            {"d": 3, "T": 1, "weighted_temperature": False},
-            {"d": 4, "T": 1, "weighted_temperature": False},
-            {"d": 2, "T": 1, "weighted_temperature": True},
-            {"d": 3, "T": 1, "weighted_temperature": True},
-            {"d": 4, "T": 1, "weighted_temperature": True}
-        ]
-    }
-}
 
 all_paths = list(Path(inst_path).rglob("*.txt"))
 fieldnames = ["params"] + [inst.name for inst in all_paths]
@@ -98,7 +81,7 @@ for algo in parameter_space:
             np.random.seed(42)
             for instance_path in all_paths:
                 proc_times, weights, deadlines = parse_instance(instance_path)
-                optimizer = optimizer_class(evaluate_tardiness, proc_times, weights, deadlines, **parameter_dict)
+                optimizer = optimizer_class(evaluate_tardiness, evaluate_tardiness_partial, proc_times, weights, deadlines, **parameter_dict)
                 solution, evaluation = optimizer.optimize(max_time = max_time)
                 row[instance_path.name] = evaluation
             writer.writerow(row)
