@@ -1,6 +1,7 @@
 import numpy as np
 
 def evaluate_tardiness(solution, proc_times, weights, deadlines):
+    """Evaluation function of the total weighted tardiness of a solution."""
     (n, m) = proc_times.shape
 
     assert weights.shape == (n,)
@@ -22,7 +23,12 @@ def evaluate_tardiness(solution, proc_times, weights, deadlines):
     return np.dot(weights, tardiness)
 
 def evaluate_tardiness_partial(solution, proc_times, weights, deadlines, pos, comp_times):
-    #return evaluate_tardiness(solution, proc_times, weights, deadlines)
+    """Evaluation function of the total weighted tardiness of a solution, with
+    computation starting only at job at position pos in the solution, and using
+    the pre-computed comp_times matrix. This allows to speed up the evaluation
+    when we know that the beginning of the matrix is already valid.
+    """
+
     (n, m) = proc_times.shape
 
     assert weights.shape == (n,)

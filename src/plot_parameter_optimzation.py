@@ -1,3 +1,8 @@
+"""This script plots the results of parameter optimization. It is intended
+to process the results of run_parameter_optimization.py. It reads a CSV file
+containing the results, and outputs a plot image.
+"""
+
 from pathlib import Path
 from sys import argv
 import seaborn as sns
@@ -6,12 +11,12 @@ from os.path import join, basename
 import matplotlib.pyplot as plt
 
 if len(argv) != 3:
-    print("error: need a path to results file and to output folder")
-    print("usage: python3", argv[0], "RES_FILE OUT_PATH")
+    print("error: need a path to results file and to output file")
+    print("usage: python3", argv[0], "RES_FILE OUT_FILE")
     exit(1)
 
 res_file = argv[1]
-out_path = argv[2]
+out_file = argv[2]
 
 data = pd.read_csv(res_file)
 data = pd.melt(data, id_vars = "params")
@@ -38,5 +43,5 @@ plt.xticks(rotation=45)
 ax.set_ylabel("")
 ax.set_xlabel("Weighted tardiness")
 fig.tight_layout()
-fig.savefig(join(out_path, algo_name + "-params.eps"))
+fig.savefig(out_file)
 plt.show()

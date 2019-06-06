@@ -230,8 +230,8 @@ to maximize their performance. These are:
 	\item number of ants $K\in\mathbb{N}$
 	\item exploitation probability $p_0\in[0,1]$
 	\item ratio between trail extrema $a\in\mathbb{R^+}$
-	\item number of iteration before trail reset $L\in\mathbb{N}$, trail
-	persistence $\rho\in[0,1]$
+	\item number of iteration before trail reset $L\in\mathbb{N}$
+	\item trail persistence $\rho\in[0,1]$
 \end{itemize}
 
 \paragraph{IG-RLS}
@@ -248,9 +248,10 @@ solution quality. Also, when multiple parameters influence the
 exploration/exploitation trade-off, the value of these parameters are modified
 as to influence the trade-off in the same direction. The 6 configurations are
 shown in section \ref{sec:res}, in figures \ref{RankBasedAS-params} to
-\ref{IG_RLS-params}. The performance of each configuration is evaluated by
-running each algorithm once on each of the 20 problem instances. The
-configuration being most often the best is retained.
+\ref{IG_RLS-params}. For MM-AS, in all configuration we set $a=5$ and $L=50$.
+The performance of each configuration is evaluated by running each algorithm
+once on each of the 20 problem instances. The configuration being most often the
+best is retained.
 
 \subsection{Algorithms performance}
 
@@ -296,16 +297,19 @@ results. A small value of $d$ favors exploitation, since this allows to evaluate
 new solutions closer to the current one in the local search phase.
 
 \begin{figure}
-	\centering
-	\includegraphics[width=0.7\textwidth]{RankBasedAS-params.eps}
-	\caption{Evaluation of different parameters configurations for the
-	Rank-based Ant System algorithm. All configurations gave identical
-	solutions, for all problem instances.}
-	\label{RankBasedAS-params}
 \end{figure}
 
 \begin{figure}
     \centering
+    \begin{minipage}{.48\textwidth}
+		\centering
+		\includegraphics[width=1.1\textwidth]{RankBasedAS-params.eps}
+		\caption{Evaluation of different parameters configurations for the
+		Rank-based Ant System algorithm. All configurations gave identical
+		solutions, for all problem instances.}
+		\label{RankBasedAS-params}
+    \end{minipage}
+    \hspace{0.02\textwidth}
     \begin{minipage}{.48\textwidth}
 		\centering
 		\includegraphics[width=1.1\textwidth]{MaxMinAS-params.eps}
@@ -315,14 +319,27 @@ new solutions closer to the current one in the local search phase.
 		factor $\rho=0.75$.}
 		\label{MaxMinAS-params}
     \end{minipage}
-    \hspace{0.02\textwidth}
+\end{figure}
+
+\begin{figure}
+    \centering
     \begin{minipage}{.48\textwidth}
 		\centering
 		\includegraphics[width=1.1\textwidth]{IG_RLS-params.eps}
-		\caption{Evaluation of different parameters configurations for the IG-RLS
-		algorithm. The best performing configuration is to destruct-construct $d=2$
-		jobs in the local search, with no weighting in the temperature calculation.}
+		\caption{Evaluation of different parameters configurations for the
+		IG-RLS algorithm. The best performing configuration is to
+		destruct-construct $d=2$ jobs in the local search, with no weighting in
+		the temperature calculation.}
 		\label{IG_RLS-params}
+    \end{minipage}
+    \hspace{0.02\textwidth}
+    \begin{minipage}{.48\textwidth}
+		\centering
+		\includegraphics[width=1.1\textwidth]{DD_Ta060-convergence.eps}
+		\caption{Convergence of the three algorithms on the instance \texttt{DD\_Ta060}. RB-AS fails to improve upon the first solution found
+		with NEH-edd, the solutions MM-AS degenerate until the trail is reset
+		every 50 iterations, while IG-RLS converges slowly.}
+		\label{convergence}
     \end{minipage}
 \end{figure}
 

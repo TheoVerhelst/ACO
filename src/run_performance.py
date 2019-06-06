@@ -1,3 +1,7 @@
+"""This script evaluates the performance of each algorithm on each problem
+instance multiple times, and outputs the results in three CSV files.
+"""
+
 from sys import argv
 import csv
 from pathlib import Path
@@ -20,10 +24,12 @@ out_path = argv[2]
 max_time = 30
 repetitions = 10
 
+# Comparison of all algorithms
+"""
 parameter_space = {
     "IG_RLS": {
         "optimizer": IG_RLS,
-        "parameters": {"d": 2, "T": 1, "weighted_temperature": False}
+        "parameters": {"d": 2, "weighted_temperature": False}
     },
     "MaxMinAS": {
         "optimizer": MaxMinAS,
@@ -32,6 +38,14 @@ parameter_space = {
     "RankBasedAS": {
         "optimizer": RankBasedAS,
         "parameters": {"n_ants":  10, "number_top": 3, "trail_persistence": 0.75}
+    }
+}"""
+
+# Comparison with and without local search
+parameter_space = {
+    "RankBasedAS-LS": {
+        "optimizer": RankBasedAS,
+        "parameters": {"n_ants":  10, "number_top": 3, "trail_persistence": 0.75, "use_local_search": True}
     }
 }
 
@@ -45,20 +59,22 @@ for algo in parameter_space:
     optimizer_class = parameter_space[algo]["optimizer"]
     parameters = parameter_space[algo]["parameters"]
 
+    results = []
+    for instance_path in all_paths:
+        proc_times, weights, deadlines = parse_instance(instance_path)
+        row = {"instance": instance_path.name}
+        print("***************")
+        print("Instance", instance_path.name)
+        print("***************")
+        seed(42)
+        np.random.seed(42)
+        for i in range(repetitions):
+            optimizer = optimizer_class(evaluate_tardiness, evaluate_tardiness_partial, proc_times, weights, deadlines, **parameters)
+            solution, evaluation = optimizer.optimize(max_time = max_time)
+            row[str(i)] = evaluation
+        results.append(row)
+
     with open(join(out_path, algo + "-results.csv"), "w") as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames = fieldnames)
         writer.writeheader()
-
-        for instance_path in all_paths:
-            proc_times, weights, deadlines = parse_instance(instance_path)
-            row = {"instance": instance_path.name}
-            print("***************")
-            print("Instance", instance_path.name)
-            print("***************")
-            seed(42)
-            np.random.seed(42)
-            for i in range(repetitions):
-                optimizer = optimizer_class(evaluate_tardiness, evaluate_tardiness_partial, proc_times, weights, deadlines, **parameters)
-                solution, evaluation = optimizer.optimize(max_time = max_time)
-                row[str(i)] = evaluation
-            writer.writerow(row)
+        writer.writerows(results)

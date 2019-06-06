@@ -13,24 +13,27 @@ if len(argv) != 3:
 res_path = argv[1]
 out_file = argv[2]
 
-all_paths = list(Path(res_path).rglob("*.csv"))
+all_paths = list(Path(res_path).rglob("*-results.csv"))
 all_data = pd.DataFrame()
 
+# Read all result files
 for path in all_paths:
-    if path.name.endswith("-results.csv"):
-        data = pd.read_csv(path)
-        data = pd.melt(data, id_vars = "instance")
-        data["algo"] = path.name[:-len("-results.csv")]
-        del data["variable"]
-        all_data = all_data.append(data)
+    data = pd.read_csv(path)
+    data = pd.melt(data, id_vars = "instance")
+    data["algo"] = path.name[:-len("-results.csv")]
+    del data["variable"]
+    all_data = all_data.append(data)
 
 algorithms = list(all_data["algo"].unique())
 instances = list(all_data["instance"].unique())
 
+# Create an empty data frame for the statistical test results
 results = pd.DataFrame([], columns = ["algo1", "algo2", "instance", "pval", "statistic"])
 
+# For each pair of different algorithms
 for i in range(len(algorithms)):
     for j in range(i + 1, len(algorithms)):
+        # Conduct a Wilcoxon rank-sum test for each instance
         for instance in instances:
             algo_1 = algorithms[i]
             algo_2 = algorithms[j]
@@ -41,7 +44,9 @@ for i in range(len(algorithms)):
                 "algo1": algo_1,
                 "algo2": algo_2,
                 "instance": instance,
-                "pval": pval * (fact(len(algorithms)) // (2 * fact(len(algorithms) - 2))), # Bonferroni correction
+                # Bonferroni correction, the test between the different algorithms
+                # are not independent
+                "pval": pval * (fact(len(algorithms)) // (2 * fact(len(algorithms) - 2))),
                 "statistic": statistic
             }])
 

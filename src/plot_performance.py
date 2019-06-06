@@ -1,3 +1,10 @@
+"""This script plots the results of the run of all algorithms on all instances.
+It is intended to process the results of run_performance.py. It reads all
+results in a folder of result CSV files, and outputs two plot images: one with
+box plots with small problem instances, and another box plot with large problem
+instances.
+"""
+
 from pathlib import Path
 from os.path import join
 from sys import argv
@@ -39,7 +46,7 @@ else:
         "DD_Ta089.txt",
         "DD_Ta090.txt"]
 
-all_paths = list(Path(res_path).rglob("*.csv"))
+all_paths = list(Path(res_path).rglob("*-results.csv"))
 all_data = pd.DataFrame()
 
 for path in all_paths:

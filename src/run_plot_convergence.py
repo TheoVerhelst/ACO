@@ -1,10 +1,17 @@
+"""This scripts runs all three algorithms on a problem instance, and plots the
+convergence of the solutions of the three algorithms. The resulting plot is
+saved in an image.
+"""
+
 from sys import argv
 from parser import parse_instance
-from evaluator import evaluate_tardiness
+from evaluator import evaluate_tardiness, evaluate_tardiness_partial
 from random import seed
 import numpy as np
 from optimizer import IG_RLS
 from ant_system import MaxMinAS, RankBasedAS
+import matplotlib.pyplot as plt
+import pickle
 
 if len(argv) != 3:
     print("error: need a path to instance file and to output file")
@@ -19,11 +26,11 @@ max_time = 30
 parameter_space = {
     "IG_RLS": {
         "optimizer": IG_RLS,
-        "parameters": {"d": 2, "T": 1, "weighted_temperature": False}
+        "parameters": {"d": 2, "weighted_temperature": False}
     },
     "MaxMinAS": {
         "optimizer": MaxMinAS,
-        "parameters": {"n_ants": 10,  "p_0": 0.9, "trail_min_max_ratio": 5, "stagnation_threshold": 5, "trail_persistence": 0.75}
+        "parameters": {"n_ants": 10,  "p_0": 0.9, "trail_min_max_ratio": 5, "stagnation_threshold": 50, "trail_persistence": 0.75}
     },
     "RankBasedAS": {
         "optimizer": RankBasedAS,
@@ -31,7 +38,11 @@ parameter_space = {
     }
 }
 
-for algo in parameter_space:
+results = {}
+
+proc_times, weights, deadlines = parse_instance(inst_file)
+
+for algo in ["RankBasedAS"]:
     print("***************")
     print("Algorithm", algo)
     print("***************")
@@ -40,7 +51,21 @@ for algo in parameter_space:
 
     seed(42)
     np.random.seed(42)
-    proc_times, weights, deadlines = parse_instance(instance_path)
-    optimizer = optimizer_class(evaluate_tardiness, proc_times, weights, deadlines, **parameters)
+    optimizer = optimizer_class(evaluate_tardiness, evaluate_tardiness_partial, proc_times, weights, deadlines, **parameters)
     solution, evaluation = optimizer.optimize(max_time = max_time)
-    writer.writerow(row)
+    results[algo] = optimizer.convergence_data
+
+with open("convergence_res.pkl", "wb") as file:
+    pickle.dump(results, file)
+
+fig, ax = plt.subplots(figsize=(5,4))
+
+for algo in sorted(results.keys()):
+    plt.plot(results[algo]["time"], results[algo]["evaluation"])
+
+plt.legend(sorted(results.keys()))
+ax.set_ylabel("Weighted tardiness (best of iteration)")
+ax.set_xlabel("Time (s)")
+fig.tight_layout()
+#fig.savefig(out_file)
+plt.show()
