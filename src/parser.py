@@ -1,8 +1,12 @@
 import numpy as np
 
 def parse_instance(filename):
-    with open(filename) as file:
-        lines = file.readlines()
+    if isinstance(filename, str):
+        with open(filename) as file:
+            lines = file.readlines()
+    else: # Path from pathlib
+        with filename.open() as file:
+            lines = file.readlines()
 
     n, m = lines[0].split()
     n = int(n)
