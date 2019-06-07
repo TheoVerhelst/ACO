@@ -31,7 +31,7 @@ This project is fully written in Python 3. For installing the required
 libraries, run
 
 ```
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 ## Running the project
@@ -62,7 +62,7 @@ python3 src/plot_performance.py results/ plots/small-instances-results.eps plots
 To perform the Wilcoxon rank-sum test to compare different algorithms, run
 
 ```
-python3 src/run_wilcoxon.py results/ results/all-wcn.csv
+python3 src/run_wilcoxon_text.py results/ results/all-wcn.csv
 ```
 
 To run algorithms and plot their convergence, run
