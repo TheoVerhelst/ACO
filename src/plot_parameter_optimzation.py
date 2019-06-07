@@ -30,13 +30,15 @@ sns.stripplot(y="params", x="value", data=data, jitter=True, color = "black", or
 ticks_labels = {
     "RankBasedAS": ["$K=3,\\,\omega=1,\\rho=0.75$", "$K=3,\\,\omega=2,\\rho=0.5$", "$K=3,\\,\omega=3,\\rho=0.25$",
                     "$K=10,\\,\omega=2,\\rho=0.75$", "$K=10,\\,\omega=4,\\rho=0.5$", "$K=10,\\,\omega=6,\\rho=0.25$"],
+    "RankBasedAS-LS": ["$K=3,\\,\omega=1,\\rho=0.75$", "$K=3,\\,\omega=2,\\rho=0.5$", "$K=3,\\,\omega=3,\\rho=0.25$",
+                    "$K=10,\\,\omega=2,\\rho=0.75$", "$K=10,\\,\omega=4,\\rho=0.5$", "$K=10,\\,\omega=6,\\rho=0.25$"],
     "IG_RLS": ["$d=2$, not weighted", "$d=3$, not weighted", "$d=4$, not weighted",
                "$d=2$, weighted", "$d=3$, weighted", "$d=4$, weighted"],
     "MaxMinAS": ["$K=3,\\,p_0=0.9,\\rho=0.75$", "$K=3,\\,p_0=0.5,\\rho=0.5$", "$K=3,\\,p_0=0.2,\\rho=0.25$",
                  "$K=10,\\,p_0=0.9,\\rho=0.75$", "$K=10,\\,p_0=0.5,\\rho=0.5$", "$K=10,\\,p_0=0.2,\\rho=0.25$"]
 }
 
-algo_name = basename(res_file)[:-len("-results.csv")]
+algo_name = basename(res_file)[:-len("-results-opti-param.csv")]
 
 ax.set_yticklabels(ticks_labels[algo_name])
 plt.xticks(rotation=45)

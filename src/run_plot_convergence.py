@@ -34,7 +34,7 @@ parameter_space = {
     },
     "RankBasedAS": {
         "optimizer": RankBasedAS,
-        "parameters": {"n_ants":  10, "number_top": 3, "trail_persistence": 0.75}
+        "parameters": {"n_ants":  10, "number_top": 3, "use_local_search": True, "trail_persistence": 0.75}
     }
 }
 
@@ -42,7 +42,7 @@ results = {}
 
 proc_times, weights, deadlines = parse_instance(inst_file)
 
-for algo in ["RankBasedAS"]:
+for algo in parameter_space:
     print("***************")
     print("Algorithm", algo)
     print("***************")
@@ -55,9 +55,6 @@ for algo in ["RankBasedAS"]:
     solution, evaluation = optimizer.optimize(max_time = max_time)
     results[algo] = optimizer.convergence_data
 
-with open("convergence_res.pkl", "wb") as file:
-    pickle.dump(results, file)
-
 fig, ax = plt.subplots(figsize=(5,4))
 
 for algo in sorted(results.keys()):
@@ -67,5 +64,4 @@ plt.legend(sorted(results.keys()))
 ax.set_ylabel("Weighted tardiness (best of iteration)")
 ax.set_xlabel("Time (s)")
 fig.tight_layout()
-#fig.savefig(out_file)
-plt.show()
+fig.savefig(out_file)

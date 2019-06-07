@@ -27,18 +27,28 @@ Ant System algorithm, namely the \emph{ranked-based} variant and the
 \emph{Max-Min} variant \cite{stutzle1998ant}. We also implemented the
 \emph{Greedy Iterative Random Local Search} \cite{karabulut2016hybrid}. The
 algorithm parameters have been optimized using a grid search procedure, and the
-performance of the three algorithms are compared. We use 20 instances of the
-permutation flow shop problems given in \cite{taillard1993benchmarks}.
+performance of the three algorithms are compared. Also, the addition of local
+search to the rank-based ant system has been evaluated. We use 20 instances of
+the permutation flow shop problems given in \cite{taillard1993benchmarks}. The
+iterated search approach gave the best results by a clear margin. The rank-based
+ant system outperforms the max-min variant on large problem instance. The
+addition of local search improved significantly the solution given by the
+rank-based ant system, although at the expense of convergence.
 
 \end{abstract}
 
 \section{Introduction}
 
 This report presents the work we conducted for the final assignment of the
-\emph{INFO-F414 Swarm Intelligence} course.
+\emph{INFO-F414 Swarm Intelligence} course. It concerns the problem of
+scheduling a set of tasks on a set of machines, where each task has to be
+executed on all machines in order, but the relative order of the tasks can be
+modified. This type of problem occurs in many real-world domains, such as
+scheduling airplane landings, jobs in a factory, or task scheduling in an
+operating system.
 
-The rest of this report is organized as follow: section \ref{sec:prob} presents
-the permutation flow shop problem with weighted tardiness in a formal manner.
+This report is organized as follow: section \ref{sec:prob} presents the
+permutation flow shop problem with weighted tardiness in a formal manner.
 Section \ref{sec:algo} describes in details the three algorithms we used to
 solve the problem, the local search approach, as well as the representation
 chosen for the different data structures. Section \ref{sec:exp} presents the
@@ -166,6 +176,7 @@ convergence by increasing exploration. The temperature is defined in
 \cite{karabulut2016hybrid} as
 
 \begin{equation}
+	\label{eq:temp}
 	Temp=\frac{1}{10n}\sum_{i=1}^{n}(LB_{Cmax}-d_i)
 \end{equation}
 
@@ -175,6 +186,16 @@ Where $LB_{Cmax}$ is the lower bound on the makespan presented in
 \begin{equation}
 	LB_{Cmax} = \max\left\{\max_{i\in N}\left(\sum_{j=1}^n p_{i,j}\right), \max_{j\in N}\left(\sum_{i=1}^n p_{i,j}\right)\right\}
 \end{equation}
+
+We designed a second version of this formula, in order to take into account the
+different weights of the jobs. The formula \ref{eq:temp} thus becomes
+
+\begin{equation}
+	Temp=\frac{1}{10n}\sum_{i=1}^{n}w_i(LB_{Cmax}-d_i)
+\end{equation}
+
+This alternate formula is used depending on the value of a flag, and we consider
+this flag as a parameter subject to optimization.
 
 The destruction-construction procedure consists in removing a set of $d$
 randomly chosen jobs from the solution, and inserting each of them iteratively
@@ -294,7 +315,10 @@ exploitation-exploration trade-off where better adjusted when favoring
 exploitation. The results for IG-RLS are not as clear-cut as for MM-AS, but
 choosing $d=2$ and no job weighting in the temperature formula gave the best
 results. A small value of $d$ favors exploitation, since this allows to evaluate
-new solutions closer to the current one in the local search phase.
+new solutions closer to the current one in the local search phase. The fact that
+the weighted temperature formula does not give better results can be explained
+by the fact that the weights have not been normalized, the weighted temperature
+has thus a larger value, simply increasing the exploration rate.
 
 \begin{figure}
 \end{figure}
@@ -321,6 +345,15 @@ new solutions closer to the current one in the local search phase.
     \end{minipage}
 \end{figure}
 
+The convergence of the three algorithms on the instance \texttt{DD\_Ta060} is
+shown in figure \ref{convergence}. One can observe that the Rank-based Ant
+System fails to improve its solution altogether, and is stuck with the initial
+solution provided by the NEH-edd heuristic as the best solution. The MaxMin Ant
+System do not converge either, and even worson over time. The spikes are caused
+by the reset of the trail every 50 iterations due to the absence of solution
+improvement. On the other hand, the iterated search approach converges slowly
+to a better solution.
+
 \begin{figure}
     \centering
     \begin{minipage}{.48\textwidth}
@@ -336,7 +369,8 @@ new solutions closer to the current one in the local search phase.
     \begin{minipage}{.48\textwidth}
 		\centering
 		\includegraphics[width=1.1\textwidth]{DD_Ta060-convergence.eps}
-		\caption{Convergence of the three algorithms on the instance \texttt{DD\_Ta060}. RB-AS fails to improve upon the first solution found
+		\caption{Convergence of the three algorithms on the instance
+		\texttt{DD\_Ta060}. RB-AS fails to improve upon the first solution found
 		with NEH-edd, the solutions MM-AS degenerate until the trail is reset
 		every 50 iterations, while IG-RLS converges slowly.}
 		\label{convergence}
@@ -344,12 +378,13 @@ new solutions closer to the current one in the local search phase.
 \end{figure}
 
 The results of the performance assessment are given in figures
-\ref{small-instances-results} and \ref{large-instances-results}. We separated
-the results into two plots, since the magnitude of the numerical results is
-different between the first 10 instances and the last 10 due to the different
-number of jobs and machines. The IG-RLS performs consistently better than the
-two AS approaches. RB-AS is better than MM-AS on large problem instances, but
-show equivalent performances on small problem instances.
+\ref{small-instances-results} and \ref{large-instances-results}. The numerical
+results are also summarized in table \ref{tab:res}. For the graphics, we
+separated the results into two plots, since the magnitude of the numerical
+results is different between the first 10 instances and the last 10 due to the
+different number of jobs and machines. The IG-RLS performs consistently better
+than the two AS approaches. RB-AS is better than MM-AS on large problem
+instances, but show equivalent performances on small problem instances.
 
 \begin{figure}
     \centering
@@ -377,7 +412,7 @@ show equivalent performances on small problem instances.
 	\centering
 	\begin{tabular}{lrrr}
 		\toprule
-		& RB-AS vs MM-AS & RB-AS vs IG-RLS & MM-AS vs IG-RLS \\
+		Instance & RB-AS vs MM-AS & RB-AS vs IG-RLS & MM-AS vs IG-RLS \\
 		\midrule
 		\texttt{DD\_Ta051} & 0.95     & $<$ 0.01 & $<$ 0.01 \\
 		\texttt{DD\_Ta052} & 1        & $<$ 0.01 & $<$ 0.01 \\
@@ -407,10 +442,129 @@ show equivalent performances on small problem instances.
 	problem instances.}
 \end{table}
 
+\begin{table}
+	\centering
+	\begin{tabular}{lrrrrrrrrrrrr}
+		\toprule
+		& \multicolumn{4}{c}{RB-AS} & \multicolumn{4}{c}{MM-AS} & \multicolumn{4}{c}{IG-RLS}\\
+		\cmidrule(r){2-5} \cmidrule(r){6-9} \cmidrule(r){10-13}
+		Instance & \multicolumn{1}{c}{B} & \multicolumn{1}{c}{W} &
+		\multicolumn{1}{c}{M} & \multicolumn{1}{c}{SD} & \multicolumn{1}{c}{B} &
+		\multicolumn{1}{c}{W} & \multicolumn{1}{c}{M} & \multicolumn{1}{c}{SD} &
+		\multicolumn{1}{c}{B} & \multicolumn{1}{c}{W} & \multicolumn{1}{c}{M} &
+		\multicolumn{1}{c}{SD} \\
+		\midrule
+    	\texttt{DD\_Ta051} & 45634  & 45634  & 45634  &  0 & 45634  & 45705  & 45641  & 22    & 25237  & 40644  & 32076  & 4864  \\
+    	\texttt{DD\_Ta052} & 47185  & 47185  & 47185  &  0 & 46973  & 48311  & 47293  & 375   & 24267  & 43496  & 35527  & 7020  \\
+    	\texttt{DD\_Ta053} & 59848  & 59848  & 59848  &  0 & 59848  & 62234  & 60144  & 744   & 32190  & 49043  & 38049  & 6093  \\
+    	\texttt{DD\_Ta054} & 53690  & 53690  & 53690  &  0 & 53540  & 55845  & 54044  & 788   & 32839  & 51259  & 39951  & 6100  \\
+    	\texttt{DD\_Ta055} & 37317  & 37317  & 37317  &  0 & 37317  & 38744  & 37527  & 456   & 28601  & 55341  & 42376  & 7322  \\
+    	\texttt{DD\_Ta056} & 43023  & 43023  & 43023  &  0 & 41799  & 44134  & 43012  & 551   & 21826  & 36621  & 29344  & 4364  \\
+    	\texttt{DD\_Ta057} & 37118  & 37118  & 37118  &  0 & 36469  & 37465  & 37102  & 249   & 27168  & 44039  & 37461  & 5389  \\
+    	\texttt{DD\_Ta058} & 46788  & 46788  & 46788  &  0 & 44206  & 46788  & 46291  & 947   & 14469  & 49618  & 37462  & 9181  \\
+    	\texttt{DD\_Ta059} & 49154  & 49154  & 49154  &  0 & 47539  & 49154  & 48984  & 508   & 27201  & 42682  & 33265  & 4373  \\
+    	\texttt{DD\_Ta060} & 84800  & 84800  & 84800  &  0 & 84788  & 86175  & 85003  & 462   & 38649  & 65859  & 54743  & 8394  \\
+    	\texttt{DD\_Ta081} & 549124 & 549124 & 549124 &  0 & 556878 & 619199 & 598403 & 20630 & 277249 & 355178 & 310094 & 28114 \\
+    	\texttt{DD\_Ta082} & 431968 & 431968 & 431968 &  0 & 437385 & 501821 & 477416 & 17598 & 216440 & 289807 & 261920 & 25592 \\
+    	\texttt{DD\_Ta083} & 552112 & 552112 & 552112 &  0 & 557897 & 643112 & 605201 & 25396 & 303774 & 399811 & 360203 & 26728 \\
+    	\texttt{DD\_Ta084} & 653370 & 653370 & 653370 &  0 & 655672 & 769261 & 716022 & 29076 & 331515 & 524537 & 419392 & 50438 \\
+    	\texttt{DD\_Ta085} & 566521 & 566521 & 566521 &  0 & 571788 & 660010 & 618935 & 25028 & 322640 & 426856 & 373880 & 31053 \\
+    	\texttt{DD\_Ta086} & 600992 & 600992 & 600992 &  0 & 605099 & 702999 & 658722 & 28452 & 283597 & 410129 & 357167 & 35063 \\
+    	\texttt{DD\_Ta087} & 493053 & 493053 & 493053 &  0 & 494855 & 563338 & 539841 & 19915 & 273615 & 405637 & 331052 & 39023 \\
+    	\texttt{DD\_Ta088} & 489618 & 489618 & 489618 &  0 & 492433 & 566568 & 534348 & 20492 & 227488 & 377792 & 306674 & 42421 \\
+    	\texttt{DD\_Ta089} & 675281 & 675281 & 675281 &  0 & 676791 & 759833 & 728938 & 29275 & 365077 & 496922 & 439191 & 39891 \\
+    	\texttt{DD\_Ta090} & 543186 & 543186 & 543186 &  0 & 546510 & 625876 & 590965 & 21600 & 314495 & 450943 & 385390 & 35392 \\
+		\bottomrule
+	\end{tabular}
+	\caption{Summary of the results in numerical form, with best (B), worst (W),
+	mean (M), and standard deviation (SD) of the 10 runs of each algorithms on
+	each of the 20 problem instances.}
+	\label{tab:res}
+\end{table}
+
+
+Finally, the results of the use of local search for the Rank-based Ant System
+are presented in figures \ref{large-instances-LS-results} to
+\ref{DD_Ta060-convergence-LS}. As it can be seen on figures
+\ref{large-instances-LS-results} and \ref{large-instances-LS-results}, the local
+search alternative clearly outperforms its standard counterpart. The Wilcoxon
+rank sum tests all give a p-value less than 0.01, we therefore do not report the
+p-values. It is worth mentioning however that the algorithm do not converge to
+the optimal solution, as shown in figure \ref{DD_Ta060-convergence-LS}, and
+actually ends up in solution worse than without the local search. The final
+solution is better because it is found in the first iterations, by searching
+locally around the initial guess provided by the NEH-edd heuristic.
+
+\begin{figure}
+    \centering
+    \begin{minipage}{.48\textwidth}
+		\centering
+		\includegraphics[width=1.1\textwidth]{small-instances-LS-results.eps}
+		\caption{}
+		\label{small-instances-LS-results}
+    \end{minipage}
+    \hspace{0.02\textwidth}
+    \begin{minipage}{.48\textwidth}
+		\centering
+		\includegraphics[width=1.1\textwidth]{large-instances-LS-results.eps}
+		\caption{}
+		\label{large-instances-LS-results}
+    \end{minipage}
+\end{figure}
+
+The RB-AS is more sensitive to parameter choices with local search than without,
+as it can be seen by comparing figures \ref{RankBasedAS-params} and
+\ref{RankBasedAS-LS-params}. The best performing configuration for the local
+search variant consists in using $K=10$ ants, selecting the best $\omega=2$ for
+updating the trail, and setting the persistence parameter $\rho$ to 0.75.
+
+\begin{figure}
+    \centering
+    \begin{minipage}{.48\textwidth}
+		\centering
+		\includegraphics[width=1.1\textwidth]{RankBasedAS-LS-params.eps}
+		\caption{Performance of the 6 parameter configurations for the Rank-based
+		Ant System with local search. The parameters have a bigger impact than
+		when not using local search, and the best configuration is the fourth
+		one.}
+		\label{RankBasedAS-LS-params}
+    \end{minipage}
+    \hspace{0.02\textwidth}
+    \begin{minipage}{.48\textwidth}
+		\centering
+		\includegraphics[width=1.1\textwidth]{DD_Ta060-convergence-LS.eps}
+		\caption{Convergence plot of the Rank-based Ant System with local
+		search. The algorithm does not converge anymore, but better solution are
+		however found than without local search because of the better
+		exploration.}
+		\label{DD_Ta060-convergence-LS}
+    \end{minipage}
+\end{figure}
 
 \section{Conclusion}
 \label{sec:conclusion}
 
+We implemented three different algorithms for solving the permutation flow shop
+problem with weighted tardiness, optimized their parameters, and evaluated their
+performances. The parameters had no impact on the solution for the rank-based
+ant system, but for the other two algorithms a parameter set favoring
+exploitation over exploration seems to perform best. The iterated search
+approach gave the best results by a clear margin on the 20 problem instances,
+except for the instance \texttt{DD\_Ta057}. The rank-based ant system
+outperformed the max-min variant on large problem instance. The addition of
+local search improved significantly the solution given by the rank-based ant
+system, although at the expense of convergence.
+
+\section*{Note to the reader}
+
+I apologize for the lengthy report, which should be 6 pages long maximum. I did
+my best to be concise and at the same time explain everything I did and report
+all of my results. This report length is partially due to the implementation of
+a third algorithm, which is not an ant system. Also, the code of the project
+does not follow the style of the course exercises (which is compiled C++ program
+for the algorithm and bash scripts for the experiments). Instead, I did
+everything in Python, which is efficient for both computations and scripting.
+This enables a more consistent coding style for the project.
 
 \bibliographystyle{splncs04}
 \bibliography{report}

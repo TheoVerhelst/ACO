@@ -28,7 +28,7 @@ inst_path = argv[1]
 out_path = argv[2]
 
 max_time = 30
-"""
+
 parameter_space = {
     "IG_RLS": {
         "optimizer": IG_RLS,
@@ -55,26 +55,12 @@ parameter_space = {
     "RankBasedAS": {
         "optimizer": RankBasedAS,
         "parameters": [
-            {"n_ants":  3, "number_top": 1, "use_local_search": True, "trail_persistence": 0.75},
-            {"n_ants":  3, "number_top": 2, "use_local_search": True, "trail_persistence": 0.5},
-            {"n_ants":  3, "number_top": 3, "use_local_search": True, "trail_persistence": 0.25},
-            {"n_ants": 10, "number_top": 2, "use_local_search": True, "trail_persistence": 0.75},
-            {"n_ants": 10, "number_top": 4, "use_local_search": True, "trail_persistence": 0.5},
-            {"n_ants": 10, "number_top": 6, "use_local_search": True, "trail_persistence": 0.25},
-        ]
-    }
-}"""
-
-parameter_space = {
-    "RankBasedAS-LS": {
-        "optimizer": RankBasedAS,
-        "parameters": [
-            {"n_ants":  3, "number_top": 1, "use_local_search": True, "trail_persistence": 0.75},
-            {"n_ants":  3, "number_top": 2, "use_local_search": True, "trail_persistence": 0.5},
-            {"n_ants":  3, "number_top": 3, "use_local_search": True, "trail_persistence": 0.25},
-            {"n_ants": 10, "number_top": 2, "use_local_search": True, "trail_persistence": 0.75},
-            {"n_ants": 10, "number_top": 4, "use_local_search": True, "trail_persistence": 0.5},
-            {"n_ants": 10, "number_top": 6, "use_local_search": True, "trail_persistence": 0.25},
+            {"n_ants":  3, "number_top": 1, "use_local_search": False, "trail_persistence": 0.75},
+            {"n_ants":  3, "number_top": 2, "use_local_search": False, "trail_persistence": 0.5},
+            {"n_ants":  3, "number_top": 3, "use_local_search": False, "trail_persistence": 0.25},
+            {"n_ants": 10, "number_top": 2, "use_local_search": False, "trail_persistence": 0.75},
+            {"n_ants": 10, "number_top": 4, "use_local_search": False, "trail_persistence": 0.5},
+            {"n_ants": 10, "number_top": 6, "use_local_search": False, "trail_persistence": 0.25},
         ]
     }
 }
@@ -104,7 +90,7 @@ for algo in parameter_space:
             row[instance_path.name] = evaluation
         results.append(row)
 
-        with open(join(out_path, algo + "-opti-param-results.csv"), "w") as csvfile:
+        with open(join(out_path, algo + "-results-opti-param.csv"), "w") as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames = fieldnames)
             writer.writeheader()
             writer.writerows(results)
